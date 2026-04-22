@@ -7,19 +7,19 @@ type Variant = "default" | "destructive" | "outline" | "ghost" | "link" | "secon
 type Size = "default" | "sm" | "lg" | "icon";
 
 const variants: Record<Variant, string> = {
-  default: "bg-orange-500 text-white hover:bg-orange-600 shadow",
-  destructive: "bg-red-600 text-white hover:bg-red-700",
-  outline: "border border-zinc-700 bg-transparent hover:bg-zinc-800 text-zinc-100",
-  ghost: "hover:bg-zinc-800 text-zinc-300 hover:text-white",
-  link: "text-orange-400 underline-offset-4 hover:underline p-0 h-auto",
-  secondary: "bg-zinc-700 text-zinc-100 hover:bg-zinc-600",
+  default:     "btn-industrial bg-orange-500 text-black font-mono font-bold tracking-widest uppercase hover:bg-orange-400",
+  destructive: "bg-red-500/10 border border-red-500/30 text-red-400 font-mono text-xs tracking-widest uppercase hover:bg-red-500/20",
+  outline:     "border border-[#2a2a34] bg-transparent font-mono text-xs tracking-widest text-[#7a7a92] uppercase hover:border-orange-500/40 hover:text-orange-400",
+  ghost:       "font-mono text-xs tracking-widest text-[#7a7a92] uppercase hover:bg-[#0e0e11] hover:text-[#e8e8f0]",
+  link:        "font-mono text-xs text-orange-400 uppercase hover:underline p-0 h-auto",
+  secondary:   "bg-[#1e1e24] border border-[#2a2a34] font-mono text-xs tracking-widest text-[#e8e8f0] uppercase hover:bg-[#2a2a34]",
 };
 
 const sizes: Record<Size, string> = {
-  default: "h-10 px-4 py-2 text-sm",
-  sm: "h-8 px-3 text-xs",
-  lg: "h-12 px-6 text-base",
-  icon: "h-10 w-10",
+  default: "h-10 px-4 py-2 text-xs",
+  sm:      "h-8 px-3 text-[10px]",
+  lg:      "h-12 px-6 text-xs",
+  icon:    "h-9 w-9",
 };
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -35,7 +35,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         ref={ref}
         className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 disabled:pointer-events-none disabled:opacity-50 cursor-pointer",
+          "inline-flex items-center justify-center gap-2 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 disabled:pointer-events-none disabled:opacity-50 cursor-pointer",
           variants[variant],
           sizes[size],
           className

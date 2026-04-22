@@ -1,46 +1,166 @@
 @import "tailwindcss";
 
+/* ─── Tokens de diseño industrial ───────────────────────────────────────── */
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --bg-base:      #08080a;
+  --bg-surface:   #0e0e11;
+  --bg-elevated:  #141418;
+  --border:       #1e1e24;
+  --border-bright:#2a2a34;
+  --text-primary: #e8e8f0;
+  --text-secondary:#7a7a92;
+  --text-muted:   #3a3a50;
+  --accent:       #f97316;
+  --accent-dim:   rgba(249,115,22,0.12);
+  --accent-glow:  rgba(249,115,22,0.25);
+  --steel:        #4a5568;
+  --grid-line:    rgba(255,255,255,0.03);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background:  var(--bg-base);
+  --color-foreground:  var(--text-primary);
+  --font-sans:         var(--font-space-grotesk);
+  --font-mono:         var(--font-space-mono);
+
+  /* animaciones custom */
+  --animate-scan:      scan 3s linear infinite;
+  --animate-flicker:   flicker 4s ease-in-out infinite;
+  --animate-slide-up:  slide-up 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+  --animate-fade-in:   fade-in 0.4s ease forwards;
+  --animate-laser:     laser 2s ease-in-out infinite;
+  --animate-blink:     blink 1.2s step-end infinite;
+
+  @keyframes scan {
+    0%   { transform: translateY(-100%); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+  }
+  @keyframes flicker {
+    0%,100% { opacity: 1; }
+    92%     { opacity: 1; }
+    93%     { opacity: 0.7; }
+    94%     { opacity: 1; }
+    96%     { opacity: 0.85; }
+    97%     { opacity: 1; }
+  }
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes laser {
+    0%,100% { box-shadow: 0 0 8px var(--accent-glow); }
+    50%     { box-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(249,115,22,0.1); }
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50%     { opacity: 0; }
+  }
 }
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { color-scheme: dark; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-* {
-  box-sizing: border-box;
+/* ─── Patrón de cuadrícula técnica (fondo) ───────────────────────────────── */
+.bg-grid {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
-::selection {
-  background: #f97316;
-  color: white;
+.bg-grid-sm {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.bg-dots {
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-::-webkit-scrollbar-track {
-  background: #18181b;
+/* ─── Noise overlay ──────────────────────────────────────────────────────── */
+.noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #3f3f46;
-  border-radius: 999px;
+/* ─── Bordes técnicos (esquinas cortadas) ────────────────────────────────── */
+.clip-corner {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #f97316;
+.clip-corner-sm {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
 }
+
+/* ─── Etiqueta técnica ───────────────────────────────────────────────────── */
+.label-tag {
+  font-family: var(--font-space-mono), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ─── Línea de acento naranja ────────────────────────────────────────────── */
+.accent-line {
+  position: relative;
+}
+.accent-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* ─── Botón con esquinas cortadas ────────────────────────────────────────── */
+.btn-industrial {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  transition: all 0.2s ease;
+}
+.btn-industrial:hover {
+  box-shadow: 0 0 20px var(--accent-glow), inset 0 0 20px rgba(249,115,22,0.05);
+}
+
+/* ─── Glow effects ───────────────────────────────────────────────────────── */
+.glow-orange {
+  box-shadow: 0 0 30px var(--accent-glow);
+}
+.text-glow {
+  text-shadow: 0 0 20px rgba(249,115,22,0.5);
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ─── Selection ──────────────────────────────────────────────────────────── */
+::selection { background: rgba(249,115,22,0.3); color: #fff; }
