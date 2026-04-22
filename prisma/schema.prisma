@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Productos / Inventario ───────────────────────────────────────────────────
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  price       Float
+  category    String
+  tags        String[]
+  fileUrl     String?
+  previewUrls String[]
+  downloads   Int      @default(0)
+  isActive    Boolean  @default(true)
+  isFeatured  Boolean  @default(false)
+  etsyListingId String?
+  facebookPostId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems  OrderItem[]
+  variants    ProductVariant[]
+}
+
+model ProductVariant {
+  id        String  @id @default(cuid())
+  productId String
+  name      String
+  price     Float?
+  fileUrl   String?
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// ─── Órdenes ─────────────────────────────────────────────────────────────────
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String      @unique
+  source      OrderSource @default(DIRECT)
+  status      OrderStatus @default(PENDING)
+  totalAmount Float
+  currency    String      @default("MXN")
+  customerEmail String
+  customerName  String
+  notes       String?
+  etsyOrderId String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  items       OrderItem[]
+  customer    Customer?   @relation(fields: [customerEmail], references: [email])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int     @default(1)
+  price     Float
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+enum OrderSource {
+  ETSY
+  FACEBOOK
+  DIRECT
+  WHATSAPP
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+// ─── Clientes ─────────────────────────────────────────────────────────────────
+model Customer {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  phone     String?
+  country   String?
+  city      String?
+  source    String?
+  totalSpent Float   @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders    Order[]
+  messages  ChatMessage[]
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+model ChatSession {
+  id          String   @id @default(cuid())
+  sessionKey  String   @unique
+  customerEmail String?
+  status      ChatStatus @default(OPEN)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  messages    ChatMessage[]
+}
+
+model ChatMessage {
+  id          String      @id @default(cuid())
+  sessionId   String
+  role        MessageRole
+  content     String
+  customerEmail String?
+  createdAt   DateTime    @default(now())
+
+  session     ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  customer    Customer?   @relation(fields: [customerEmail], references: [email])
+}
+
+enum ChatStatus {
+  OPEN
+  CLOSED
+  ESCALATED
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+// ─── Automatizaciones ─────────────────────────────────────────────────────────
+model Automation {
+  id          String   @id @default(cuid())
+  name        String
+  trigger     String
+  action      String
+  config      Json     @default("{}")
+  isActive    Boolean  @default(true)
+  lastRunAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  logs        AutomationLog[]
+}
+
+model AutomationLog {
+  id           String   @id @default(cuid())
+  automationId String
+  status       String
+  output       String?
+  error        String?
+  createdAt    DateTime @default(now())
+
+  automation   Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+}
+
+// ─── Analíticas ───────────────────────────────────────────────────────────────
+model DailyStat {
+  id           String   @id @default(cuid())
+  date         DateTime @unique
+  revenue      Float    @default(0)
+  orders       Int      @default(0)
+  newCustomers Int      @default(0)
+  pageViews    Int      @default(0)
+  downloads    Int      @default(0)
+  createdAt    DateTime @default(now())
+}
